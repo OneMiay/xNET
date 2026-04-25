@@ -234,6 +234,58 @@ Notes:
 - `.conf` is typically for AmneziaWG, WireGuard, routers, or other compatible clients.
 - If you switch to AmneziaWG 2.0, generate a new `.conf`; old guest configs from legacy installations may not work.
 
+## Export connection files
+
+There are two common ways to export connection settings from the Windows client.
+
+### Method 1: export from the protocol list
+
+Path:
+
+```text
+Open server -> Protocols
+```
+
+Then:
+
+- click the download icon on the right side of `WireGuard`, `XRay`, or `OpenVPN`;
+- for `AmneziaWG`, open the protocol first and then look for export/share inside it.
+
+This usually exports a `File with connection settings`.
+
+### Method 2: export from the Share screen
+
+Path:
+
+```text
+Open server or current connection -> Share
+```
+
+On the share screen:
+
+- `Share` sends or saves the connection settings as a file;
+- `Copy` copies the connection data to the clipboard;
+- `Show connection settings` displays the raw connection parameters;
+- `QR` is the easiest option for connecting a phone.
+
+Practical usage:
+
+- for another Windows PC: use `Share` or the download icon for the needed protocol;
+- for a phone: use `QR` or `Share`;
+- for a router or third-party client: export `WireGuard` or `AmneziaWG` settings as a file when available.
+
+If you need a plain text config:
+
+1. open `Show connection settings`;
+2. review the generated connection parameters;
+3. save or share them in the offered format.
+
+If the client does not show `File with connection settings`, possible reasons are:
+
+- the selected protocol exports only `vpn://` or QR in this scenario;
+- the current access type is not suitable for file export;
+- the required export option is inside the protocol page instead of the generic share page.
+
 ## Fix access to local network when VPN is enabled
 
 If local devices become unreachable after enabling Amnezia on Windows, add local/private networks to split tunneling so they bypass VPN.
