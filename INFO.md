@@ -169,3 +169,138 @@ View proxy log:
 ```bash
 tail -f /usr/local/3proxy/logs/3proxy.log
 ```
+
+# AmneziaVPN notes
+
+## Update Amnezia on PC and reconnect to existing VPS
+
+1. In AmneziaVPN, create a backup:
+
+```text
+Settings -> Backup -> Create backup
+```
+
+2. Update the Windows client:
+
+```text
+Settings -> About AmneziaVPN -> Check for updates
+```
+
+3. Download the new installer, close AmneziaVPN from the system tray, and install the new version over the old one.
+
+4. If the VPS already has Amnezia installed and you only need to reconnect the client:
+
+```text
++ -> Self-hosted VPN -> enter server IP/login/password -> Skip setup
+```
+
+5. Then open the server entry and run:
+
+```text
+Management -> Check the server for previously installed Amnezia services
+```
+
+This re-attaches the client to the existing Amnezia installation without reinstalling the server.
+
+## Recreate connection from scratch
+
+If you want to fully rebuild the Amnezia setup on the VPS:
+
+```text
+Settings -> Servers -> select server -> Clear server from Amnezia software
+```
+
+After cleanup, add the server again:
+
+```text
++ -> Self-hosted VPN
+```
+
+Then install the needed protocol from the server settings.
+
+## Create a .conf file in Amnezia
+
+You normally do not create `.conf` by hand. Amnezia generates it.
+
+To export a `.conf`:
+
+```text
+Open AmneziaVPN on a device with full access -> Share -> select server -> select protocol -> select format that exports .conf -> Share
+```
+
+Notes:
+
+- `vpn://...` is for the AmneziaVPN app.
+- `.conf` is typically for AmneziaWG, WireGuard, routers, or other compatible clients.
+- If you switch to AmneziaWG 2.0, generate a new `.conf`; old guest configs from legacy installations may not work.
+
+## Fix access to local network when VPN is enabled
+
+If local devices become unreachable after enabling Amnezia on Windows, add local/private networks to split tunneling so they bypass VPN.
+
+Path:
+
+```text
+Settings -> Connection -> Site-based split tunneling
+```
+
+Mode:
+
+```text
+Addresses from the list should not be accessed via VPN
+```
+
+Important:
+
+- Do not use the mode `Only the sites listed here will be accessed through the VPN` for this task. In that mode, sites such as `ipecho.net` will go directly through the ISP and show the real public IP.
+- Start with only the local subnet below. Do not add the full list until the basic case works.
+
+First test entry:
+
+```text
+192.168.2.0/24
+```
+
+Recommended list:
+
+```text
+192.168.0.0/16
+172.16.0.0/12
+10.0.0.0/8
+169.254.0.0/16
+100.64.0.0/10
+224.0.0.0/4
+```
+
+For the current local network:
+
+```text
+192.168.2.0/24
+```
+
+After adding the entries:
+
+1. Enable split tunneling.
+2. Check `Settings -> Connection -> App-based split tunneling` and make sure the browser is not added there as an app that bypasses VPN.
+3. Disconnect VPN.
+4. Connect VPN again.
+5. Close and reopen the browser.
+
+Expected result:
+
+- local devices such as `192.168.2.x` should open directly;
+- external sites should still go through the VPN;
+- `https://ipecho.net/plain` should show the VPS IP, not the ISP IP.
+
+If `ipecho.net` still shows the real IP after adding even one local entry:
+
+- verify again that the selected mode is `Addresses from the list should not be accessed via VPN`;
+- verify that the browser is not listed in `App-based split tunneling`;
+- try keeping only `192.168.2.0/24` and remove all other entries for testing;
+- if the behavior is still wrong, update AmneziaVPN to the latest version because older Windows builds had split tunneling issues.
+
+If local PCs are still not reachable, also check Windows settings:
+
+- Network profile should be `Private`.
+- `Network discovery` should be enabled.
+- `File and Printer Sharing` should be enabled.
